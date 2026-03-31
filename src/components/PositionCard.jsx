@@ -14,6 +14,7 @@ const PositionCard = ({ position, index, onOverrideClick, onDelete }) => {
   const geminiProTimer = calculateTimeRemaining(position.geminiPro, position.overrides?.geminiPro);
   const geminiFlashTimer = calculateTimeRemaining(position.geminiFlash, position.overrides?.geminiFlash);
   const claudeTimer = calculateTimeRemaining(position.claude, position.overrides?.claude);
+  const claudeAnthropicTimer = calculateTimeRemaining(position.claudeAnthropic, position.overrides?.claudeAnthropic);
 
   return (
     <div 
@@ -37,17 +38,17 @@ const PositionCard = ({ position, index, onOverrideClick, onDelete }) => {
           }}>{index + 1}</span>
           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{position.name}</span>
           
-          {position.country && (
-            <span style={{ 
-              fontSize: '11px', padding: '2px 6px', borderRadius: '6px', 
-              background: 'rgba(0,0,0,0.06)', color: 'var(--text-muted)', fontWeight: 'bold', flexShrink: 0 
-            }}>{position.country}</span>
-          )}
           {position.accountType && (
             <span style={{ 
               fontSize: '11px', padding: '2px 6px', borderRadius: '6px', 
               background: 'var(--accent)', color: '#fff', fontWeight: 'bold', flexShrink: 0 
             }}>{position.accountType}</span>
+          )}
+          {position.country && (
+            <span style={{ 
+              fontSize: '11px', padding: '2px 6px', borderRadius: '6px', 
+              background: 'rgba(0,0,0,0.06)', color: 'var(--text-muted)', fontWeight: 'bold', flexShrink: 0 
+            }}>{position.country}</span>
           )}
         </h3>
         <button 
@@ -59,10 +60,25 @@ const PositionCard = ({ position, index, onOverrideClick, onDelete }) => {
       </div>
       
       <div>
-        <ProgressBar name="Gemini Pro" data={geminiProTimer} />
-        <ProgressBar name="Gemini Flash" data={geminiFlashTimer} />
-        {position.claudeEnabled !== false && (
-          <ProgressBar name="Claude" data={claudeTimer} />
+        <ProgressBar name="Gemini 3.1 Pro" data={geminiProTimer} />
+        <ProgressBar name="Gemini 3 Flash" data={geminiFlashTimer} />
+        <ProgressBar name="Claude 4.6 Opus/Sonnet" data={claudeTimer} />
+        {position.claudeAnthropicEnabled && (
+          <div style={{ position: 'relative' }}>
+             <ProgressBar 
+                name={
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    Claude Anthropic
+                    {position.claudeAnthropicBadge && (
+                      <span style={{ fontSize: '10px', background: 'var(--accent)', color: 'white', padding: '2px 6px', borderRadius: '8px', fontWeight: 'bold' }}>
+                        {position.claudeAnthropicBadge}
+                      </span>
+                    )}
+                  </span>
+                } 
+                data={claudeAnthropicTimer} 
+             />
+          </div>
         )}
       </div>
     </div>

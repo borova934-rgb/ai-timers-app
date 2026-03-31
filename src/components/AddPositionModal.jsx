@@ -6,12 +6,14 @@ const AddPositionModal = ({ onClose, onSave }) => {
   const [name, setName] = useState('');
   
   // Default string for date select to initialize
-  const defaultDateStr = "04/06/2026 04:02:01 PM";
+  const defaultDateStr = "";
 
   const [geminiPro, setGeminiPro] = useState(defaultDateStr);
   const [geminiFlash, setGeminiFlash] = useState(defaultDateStr);
   const [claude, setClaude] = useState(defaultDateStr);
-  const [claudeEnabled, setClaudeEnabled] = useState(true);
+  const [claudeAnthropic, setClaudeAnthropic] = useState(defaultDateStr);
+  const [claudeAnthropicEnabled, setClaudeAnthropicEnabled] = useState(false);
+  const [claudeAnthropicBadge, setClaudeAnthropicBadge] = useState('Pro');
   const [country, setCountry] = useState('');
   const [accountType, setAccountType] = useState('Free');
 
@@ -24,10 +26,12 @@ const AddPositionModal = ({ onClose, onSave }) => {
       geminiPro,
       geminiFlash,
       claude,
-      claudeEnabled,
+      claudeAnthropic,
+      claudeAnthropicEnabled,
+      claudeAnthropicBadge,
       country,
       accountType,
-      overrides: { geminiPro: null, geminiFlash: null, claude: null }
+      overrides: { geminiPro: null, geminiFlash: null, claude: null, claudeAnthropic: null }
     });
   };
 
@@ -37,6 +41,7 @@ const AddPositionModal = ({ onClose, onSave }) => {
     // Auto-fill feature: if flash and claude are untouched (equal to default), we duplicate it.
     if (geminiFlash === defaultDateStr) setGeminiFlash(val);
     if (claude === defaultDateStr) setClaude(val);
+    if (claudeAnthropic === defaultDateStr) setClaudeAnthropic(val);
   };
 
   const inputStyle = {
@@ -99,32 +104,50 @@ const AddPositionModal = ({ onClose, onSave }) => {
           </p>
 
           <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
-            Gemini Pro
+            Gemini 3.1 Pro
           </label>
           <IOSDateSelect value={geminiPro} onChange={handleGeminiProChange} />
 
           <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
-            Gemini Flash
+            Gemini 3 Flash
           </label>
           <IOSDateSelect value={geminiFlash} onChange={setGeminiFlash} />
 
-          <label style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', fontSize: '15px', color: 'var(--text-main)', cursor: 'pointer' }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
+            Claude 4.6 Opus/Sonnet
+          </label>
+          <IOSDateSelect value={claude} onChange={setClaude} />
+
+          <label style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', fontSize: '15px', color: 'var(--text-main)', cursor: 'pointer', marginTop: '16px' }}>
             <input 
               type="checkbox" 
-              checked={claudeEnabled} 
-              onChange={e => setClaudeEnabled(e.target.checked)} 
+              checked={claudeAnthropicEnabled} 
+              onChange={e => setClaudeAnthropicEnabled(e.target.checked)} 
               style={{ marginRight: '10px', width: '20px', height: '20px', accentColor: 'var(--accent)' }}
             />
-            Показывать таймер Claude Anthropic
+            Показывать таймер Claude Anthropic на главной
           </label>
 
-          {claudeEnabled && (
-            <>
+          {claudeAnthropicEnabled && (
+            <div style={{ background: 'rgba(0,0,0,0.03)', padding: '12px', borderRadius: '12px', marginBottom: '16px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
-                Окончание таймера Claude
+                Окончание таймера Claude Anthropic
               </label>
-              <IOSDateSelect value={claude} onChange={setClaude} />
-            </>
+              <IOSDateSelect value={claudeAnthropic} onChange={setClaudeAnthropic} />
+              
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Значок на главном экране (например: "Pro")</label>
+              <input 
+                type="text" 
+                value={claudeAnthropicBadge} 
+                onChange={e => setClaudeAnthropicBadge(e.target.value)}
+                placeholder="Pro"
+                style={{
+                  width: '100%', padding: '12px', borderRadius: '10px', 
+                  border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-main)', marginBottom: 0, fontSize: '16px', outline: 'none'
+                }}
+              />
+            </div>
           )}
 
           <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>

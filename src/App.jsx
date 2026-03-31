@@ -65,16 +65,18 @@ function App() {
     const t1 = calculateTimeRemaining(pos.geminiPro, pos.overrides?.geminiPro);
     const t2 = calculateTimeRemaining(pos.geminiFlash, pos.overrides?.geminiFlash);
     const t3 = calculateTimeRemaining(pos.claude, pos.overrides?.claude);
+    const t4 = calculateTimeRemaining(pos.claudeAnthropic, pos.overrides?.claudeAnthropic);
     
-    const includeClaude = pos.claudeEnabled !== false;
+    const includeClaudeAnthropic = pos.claudeAnthropicEnabled !== false;
 
-    let zeroes = (t1.isZero ? 1 : 0) + (t2.isZero ? 1 : 0);
-    if (includeClaude && t3.isZero) zeroes += 1;
+    let zeroes = (t1.isZero ? 1 : 0) + (t2.isZero ? 1 : 0) + (t3.isZero ? 1 : 0);
+    if (includeClaudeAnthropic && t4.isZero) zeroes += 1;
     
     let minWait = Infinity;
     if (!t1.isZero) minWait = Math.min(minWait, t1.remainingMs);
     if (!t2.isZero) minWait = Math.min(minWait, t2.remainingMs);
-    if (includeClaude && !t3.isZero) minWait = Math.min(minWait, t3.remainingMs);
+    if (!t3.isZero) minWait = Math.min(minWait, t3.remainingMs);
+    if (includeClaudeAnthropic && !t4.isZero) minWait = Math.min(minWait, t4.remainingMs);
     
     return { zeroes, minWait };
   };

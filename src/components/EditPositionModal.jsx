@@ -8,13 +8,16 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
   const [geminiPro, setGeminiPro] = useState(position.geminiPro);
   const [geminiFlash, setGeminiFlash] = useState(position.geminiFlash);
   const [claude, setClaude] = useState(position.claude);
-  const [claudeEnabled, setClaudeEnabled] = useState(position.claudeEnabled !== false);
+  const [claudeAnthropic, setClaudeAnthropic] = useState(position.claudeAnthropic || '');
+  const [claudeAnthropicEnabled, setClaudeAnthropicEnabled] = useState(position.claudeAnthropicEnabled || false);
+  const [claudeAnthropicBadge, setClaudeAnthropicBadge] = useState(position.claudeAnthropicBadge || 'Pro');
   const [country, setCountry] = useState(position.country || '');
   const [accountType, setAccountType] = useState(position.accountType || 'Free');
 
   const geminiProTimer = calculateTimeRemaining(geminiPro, position.overrides?.geminiPro);
   const geminiFlashTimer = calculateTimeRemaining(geminiFlash, position.overrides?.geminiFlash);
   const claudeTimer = calculateTimeRemaining(claude, position.overrides?.claude);
+  const claudeAnthropicTimer = calculateTimeRemaining(claudeAnthropic, position.overrides?.claudeAnthropic);
 
   const handleOverride = (field, delta) => {
     const current = position.overrides?.[field] !== null && position.overrides?.[field] !== undefined 
@@ -41,7 +44,9 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
       geminiPro,
       geminiFlash,
       claude,
-      claudeEnabled,
+      claudeAnthropic,
+      claudeAnthropicEnabled,
+      claudeAnthropicBadge,
       country,
       accountType
     });
@@ -160,20 +165,37 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
           </div>
         </div>
 
-        {renderControl('Gemini Pro', 'geminiPro', geminiProTimer, geminiPro, setGeminiPro)}
-        {renderControl('Gemini Flash', 'geminiFlash', geminiFlashTimer, geminiFlash, setGeminiFlash)}
+        {renderControl('Gemini 3.1 Pro', 'geminiPro', geminiProTimer, geminiPro, setGeminiPro)}
+        {renderControl('Gemini 3 Flash', 'geminiFlash', geminiFlashTimer, geminiFlash, setGeminiFlash)}
+        {renderControl('Claude 4.6 Opus/Sonnet', 'claude', claudeTimer, claude, setClaude)}
         
         <label style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', fontSize: '15px', color: 'var(--text-main)', cursor: 'pointer', background: 'var(--panel-bg)', padding: '16px', borderRadius: '12px' }}>
           <input 
             type="checkbox" 
-            checked={claudeEnabled} 
-            onChange={e => setClaudeEnabled(e.target.checked)} 
+            checked={claudeAnthropicEnabled} 
+            onChange={e => setClaudeAnthropicEnabled(e.target.checked)} 
             style={{ marginRight: '10px', width: '20px', height: '20px', accentColor: 'var(--accent)' }}
           />
-          Показывать таймер Claude Anthropic
+          Показывать таймер Claude Anthropic на главной
         </label>
 
-        {claudeEnabled && renderControl('Claude', 'claude', claudeTimer, claude, setClaude)}
+        {claudeAnthropicEnabled && (
+          <div style={{ background: 'rgba(0,0,0,0.03)', padding: '12px', borderRadius: '12px', marginBottom: '16px' }}>
+            {renderControl('Claude Anthropic', 'claudeAnthropic', claudeAnthropicTimer, claudeAnthropic, setClaudeAnthropic)}
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Значок на главном экране (например: "Pro")</label>
+            <input 
+              type="text" 
+              value={claudeAnthropicBadge} 
+              onChange={e => setClaudeAnthropicBadge(e.target.value)}
+              placeholder="Pro"
+              style={{
+                width: '100%', padding: '12px', borderRadius: '10px', 
+                border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-main)', marginBottom: 0, fontSize: '16px', outline: 'none'
+              }}
+            />
+          </div>
+        )}
 
         <button 
           onClick={saveDatesAndClose}

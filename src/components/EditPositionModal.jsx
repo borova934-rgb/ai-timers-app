@@ -8,6 +8,9 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
   const [geminiPro, setGeminiPro] = useState(position.geminiPro);
   const [geminiFlash, setGeminiFlash] = useState(position.geminiFlash);
   const [claude, setClaude] = useState(position.claude);
+  const [claudeEnabled, setClaudeEnabled] = useState(position.claudeEnabled !== false);
+  const [country, setCountry] = useState(position.country || '');
+  const [accountType, setAccountType] = useState(position.accountType || 'Free');
 
   const geminiProTimer = calculateTimeRemaining(geminiPro, position.overrides?.geminiPro);
   const geminiFlashTimer = calculateTimeRemaining(geminiFlash, position.overrides?.geminiFlash);
@@ -37,7 +40,10 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
       name,
       geminiPro,
       geminiFlash,
-      claude
+      claude,
+      claudeEnabled,
+      country,
+      accountType
     });
     onClose();
   };
@@ -121,9 +127,53 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
           }}
         />
 
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Страна (опц.)</label>
+            <input 
+              type="text" 
+              value={country} 
+              onChange={e => setCountry(e.target.value)}
+              placeholder="USA"
+              style={{
+                width: '100%', padding: '12px', borderRadius: '10px', 
+                border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-main)', marginBottom: 0, fontSize: '16px', outline: 'none'
+              }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Тип аккаунта</label>
+            <select 
+              value={accountType} 
+              onChange={e => setAccountType(e.target.value)}
+              style={{
+                width: '100%', padding: '12px', borderRadius: '10px', 
+                border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-main)', marginBottom: 0, fontSize: '16px', outline: 'none', WebkitAppearance: 'none'
+              }}
+            >
+              <option value="Free">Free</option>
+              <option value="Pro">Pro</option>
+              <option value="Ultra">Ultra</option>
+            </select>
+          </div>
+        </div>
+
         {renderControl('Gemini Pro', 'geminiPro', geminiProTimer, geminiPro, setGeminiPro)}
         {renderControl('Gemini Flash', 'geminiFlash', geminiFlashTimer, geminiFlash, setGeminiFlash)}
-        {renderControl('Claude', 'claude', claudeTimer, claude, setClaude)}
+        
+        <label style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', fontSize: '15px', color: 'var(--text-main)', cursor: 'pointer', background: 'var(--panel-bg)', padding: '16px', borderRadius: '12px' }}>
+          <input 
+            type="checkbox" 
+            checked={claudeEnabled} 
+            onChange={e => setClaudeEnabled(e.target.checked)} 
+            style={{ marginRight: '10px', width: '20px', height: '20px', accentColor: 'var(--accent)' }}
+          />
+          Показывать таймер Claude Anthropic
+        </label>
+
+        {claudeEnabled && renderControl('Claude', 'claude', claudeTimer, claude, setClaude)}
 
         <button 
           onClick={saveDatesAndClose}

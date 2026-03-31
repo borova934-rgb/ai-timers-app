@@ -66,12 +66,15 @@ function App() {
     const t2 = calculateTimeRemaining(pos.geminiFlash, pos.overrides?.geminiFlash);
     const t3 = calculateTimeRemaining(pos.claude, pos.overrides?.claude);
     
-    const zeroes = (t1.isZero ? 1 : 0) + (t2.isZero ? 1 : 0) + (t3.isZero ? 1 : 0);
+    const includeClaude = pos.claudeEnabled !== false;
+
+    let zeroes = (t1.isZero ? 1 : 0) + (t2.isZero ? 1 : 0);
+    if (includeClaude && t3.isZero) zeroes += 1;
     
     let minWait = Infinity;
     if (!t1.isZero) minWait = Math.min(minWait, t1.remainingMs);
     if (!t2.isZero) minWait = Math.min(minWait, t2.remainingMs);
-    if (!t3.isZero) minWait = Math.min(minWait, t3.remainingMs);
+    if (includeClaude && !t3.isZero) minWait = Math.min(minWait, t3.remainingMs);
     
     return { zeroes, minWait };
   };

@@ -11,6 +11,9 @@ const AddPositionModal = ({ onClose, onSave }) => {
   const [geminiPro, setGeminiPro] = useState(defaultDateStr);
   const [geminiFlash, setGeminiFlash] = useState(defaultDateStr);
   const [claude, setClaude] = useState(defaultDateStr);
+  const [claudeEnabled, setClaudeEnabled] = useState(true);
+  const [country, setCountry] = useState('');
+  const [accountType, setAccountType] = useState('Free');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,6 +24,9 @@ const AddPositionModal = ({ onClose, onSave }) => {
       geminiPro,
       geminiFlash,
       claude,
+      claudeEnabled,
+      country,
+      accountType,
       overrides: { geminiPro: null, geminiFlash: null, claude: null }
     });
   };
@@ -102,10 +108,53 @@ const AddPositionModal = ({ onClose, onSave }) => {
           </label>
           <IOSDateSelect value={geminiFlash} onChange={setGeminiFlash} />
 
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
-            Claude
+          <label style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', fontSize: '15px', color: 'var(--text-main)', cursor: 'pointer' }}>
+            <input 
+              type="checkbox" 
+              checked={claudeEnabled} 
+              onChange={e => setClaudeEnabled(e.target.checked)} 
+              style={{ marginRight: '10px', width: '20px', height: '20px', accentColor: 'var(--accent)' }}
+            />
+            Показывать таймер Claude Anthropic
           </label>
-          <IOSDateSelect value={claude} onChange={setClaude} />
+
+          {claudeEnabled && (
+            <>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
+                Окончание таймера Claude
+              </label>
+              <IOSDateSelect value={claude} onChange={setClaude} />
+            </>
+          )}
+
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
+                Страна (опц.)
+              </label>
+              <input 
+                type="text" 
+                value={country} 
+                onChange={e => setCountry(e.target.value)} 
+                placeholder="USA"
+                style={{...inputStyle, marginBottom: 0, fontFamily: 'inherit'}}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
+                Тип аккаунта
+              </label>
+              <select 
+                value={accountType} 
+                onChange={e => setAccountType(e.target.value)}
+                style={{...inputStyle, marginBottom: 0, fontFamily: 'inherit', WebkitAppearance: 'none'}}
+              >
+                <option value="Free">Free</option>
+                <option value="Pro">Pro</option>
+                <option value="Ultra">Ultra</option>
+              </select>
+            </div>
+          </div>
 
           <button 
             type="submit" 

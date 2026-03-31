@@ -29,13 +29,26 @@ const PositionCard = ({ position, index, onOverrideClick, onDelete }) => {
       onClick={() => onOverrideClick(position)}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h3 style={{ margin: 0, fontSize: '17px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}>
+        <h3 style={{ margin: 0, fontSize: '17px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', maxWidth: '80%' }}>
           <span style={{ 
             background: 'var(--accent)', color: '#fff', width: '22px', height: '22px', 
             borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-            fontSize: '11px', fontWeight: 'bold' 
+            fontSize: '11px', fontWeight: 'bold', flexShrink: 0
           }}>{index + 1}</span>
-          {position.name}
+          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{position.name}</span>
+          
+          {position.country && (
+            <span style={{ 
+              fontSize: '11px', padding: '2px 6px', borderRadius: '6px', 
+              background: 'rgba(0,0,0,0.06)', color: 'var(--text-muted)', fontWeight: 'bold', flexShrink: 0 
+            }}>{position.country}</span>
+          )}
+          {position.accountType && (
+            <span style={{ 
+              fontSize: '11px', padding: '2px 6px', borderRadius: '6px', 
+              background: 'var(--accent)', color: '#fff', fontWeight: 'bold', flexShrink: 0 
+            }}>{position.accountType}</span>
+          )}
         </h3>
         <button 
           onClick={(e) => { e.stopPropagation(); onDelete(position.id); }} 
@@ -48,7 +61,9 @@ const PositionCard = ({ position, index, onOverrideClick, onDelete }) => {
       <div>
         <ProgressBar name="Gemini Pro" data={geminiProTimer} />
         <ProgressBar name="Gemini Flash" data={geminiFlashTimer} />
-        <ProgressBar name="Claude" data={claudeTimer} />
+        {position.claudeEnabled !== false && (
+          <ProgressBar name="Claude" data={claudeTimer} />
+        )}
       </div>
     </div>
   );

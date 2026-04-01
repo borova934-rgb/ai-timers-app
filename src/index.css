@@ -88,6 +88,8 @@ body {
   transition: background-color var(--ios-transition), color var(--ios-transition);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 input, button {

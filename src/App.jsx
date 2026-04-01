@@ -151,31 +151,32 @@ function App() {
     <div style={{ maxWidth: '600px', margin: '0 auto', minHeight: '100vh', padding: '16px', paddingBottom: '80px' }}>
       
       {/* Header & Theme Switcher */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', margin: '16px 0 24px 0' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-          <h1 style={{ margin: 0, fontSize: '32px', fontWeight: '800', lineHeight: 1 }}>Аккаунты</h1>
-          <span style={{ fontSize: '13px', color: 'var(--text-dim)', fontWeight: 'bold' }}>v1.0.2</span>
-        </div>
-        
-        <div style={{ display: 'flex', background: 'var(--panel-bg)', borderRadius: '16px', padding: '4px', boxShadow: 'var(--shadow)' }}>
-          {['light', 'dark', 'cream', 'titanium'].map((t) => (
-            <button 
-              key={t}
-              onClick={() => handleThemeChange(t)}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '12px',
-                background: theme === t ? 'var(--accent)' : 'transparent',
-                color: theme === t ? '#fff' : 'var(--text-dim)',
-                textTransform: 'capitalize',
-                fontSize: '14px',
-                fontWeight: theme === t ? 'bold' : 'normal',
-                transition: 'background 0.2s, color 0.2s'
-              }}
-            >
-              {t}
-            </button>
-          ))}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '8px 0 24px 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
+            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '800', lineHeight: 1.1, letterSpacing: '-0.5px' }}>Аккаунты</h1>
+            <span style={{ fontSize: '12px', color: 'var(--text-dim)', opacity: 0.8 }}>v1.0.2</span>
+          </div>
+          
+          <div style={{ display: 'flex', background: 'var(--panel-bg)', borderRadius: '14px', padding: '3px', boxShadow: 'var(--shadow)', height: 'fit-content' }}>
+            {['light', 'dark', 'titanium', 'cream'].map((t) => (
+              <button 
+                key={t}
+                onClick={() => handleThemeChange(t)}
+                style={{
+                  padding: '5px 10px',
+                  borderRadius: '11px',
+                  background: theme === t ? 'var(--accent)' : 'transparent',
+                  color: theme === t ? '#fff' : 'var(--text-dim)',
+                  fontSize: '12px',
+                  fontWeight: theme === t ? 'bold' : '500',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -197,16 +198,15 @@ function App() {
         )}
       </div>
 
-      {/* Floating Action Button */}
       <div className="ios-glass" style={{
         position: 'fixed',
-        bottom: '32px',
+        bottom: '44px',
         left: '50%',
         transform: 'translateX(-50%)',
         borderRadius: '50%',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
         padding: '2px', // subtle border effect
-        zIndex: 100
+        zIndex: 1000
       }}>
         <button 
           onClick={() => setShowAddModal(true)}

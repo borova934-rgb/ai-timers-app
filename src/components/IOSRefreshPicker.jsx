@@ -1,69 +1,105 @@
 import React, { useState, useEffect } from 'react';
 import Picker from 'react-mobile-picker';
 
-const IOSRefreshPicker = ({ days, hours, onChange, disabled }) => {
+const IOSRefreshPicker = ({ value, onChange, label }) => {
   const [pickerValue, setPickerValue] = useState({
-    d: String(days || 0),
-    h: String(hours || 0)
+    days: value?.days || 0,
+    hours: value?.hours || 0,
   });
 
-  // Sync internal state if external props change
+  const selections = {
+    days: Array.from({ length: 31 }, (_, i) => i),
+    hours: Array.from({ length: 24 }, (_, i) => i),
+  };
+
   useEffect(() => {
     setPickerValue({
-      d: String(days || 0),
-      h: String(hours || 0)
+      days: value?.days || 0,
+      hours: value?.hours || 0,
     });
-  }, [days, hours]);
+  }, [value]);
 
   const handlePickerChange = (newValue) => {
     setPickerValue(newValue);
-    onChange(newValue.d, newValue.h);
+    onChange(newValue);
   };
 
-  const daysOptions = Array.from({ length: 31 }, (_, i) => String(i));
-  const hoursOptions = Array.from({ length: 24 }, (_, i) => String(i));
-
   return (
-    <div style={{ 
-      opacity: disabled ? 0.5 : 1, 
-      pointerEvents: disabled ? 'none' : 'auto',
-      marginTop: '8px'
-    }}>
-      <div style={{
-          backgroundColor: 'var(--bg-color)',
-          borderRadius: '16px',
-          padding: '4px',
-          border: '1px solid var(--separator)',
-          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.05)',
-          overflow: 'hidden'
-      }}>
-        <Picker value={pickerValue} onChange={handlePickerChange} wheelMode="normal">
-          <Picker.Column name="d">
-            {daysOptions.map(option => (
-              <Picker.Item key={option} value={option}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                  <span>{option}</span>
-                  <span style={{ fontSize: '12px', opacity: 0.6 }}>дн.</span>
-                </div>
-              </Picker.Item>
-            ))}
-          </Picker.Column>
-          <Picker.Column name="h">
-            {hoursOptions.map(option => (
-              <Picker.Item key={option} value={option}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                  <span>{option}</span>
-                  <span style={{ fontSize: '12px', opacity: 0.6 }}>час.</span>
-                </div>
-              </Picker.Item>
-            ))}
-          </Picker.Column>
+    <div className="ios-picker-container">
+      {label && <label className="ios-picker-label">{label}</label>}
+      <div className="ios-picker-wrapper">
+        <Picker
+          value={pickerValue}
+          onChange={handlePickerChange}
+          wheelMode="natural"
+        >
+          {Object.keys(selections).map(name => (
+            <Picker.Column key={name} name={name}>
+              {selections[name].map(option => (
+                <Picker.Item key={option} value={option}>
+                  {({ selected }) => (
+                    <div style={{ 
+                      color: selected ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                      fontWeight: selected ? '600' : '400',
+                      fontSize: '18px',
+                      padding: '8px 0',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      {option} {name === 'days' ? 'д.' : 'ч.'}
+                    </div>
+                  )}
+                </Picker.Item>
+              ))}
+            </Picker.Column>
+          ))}
         </Picker>
+        {/* iOS Selection Overlay */}
+        <div className="ios-picker-selection-highlight"></div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: '11px', color: 'var(--text-dim)', marginTop: '4px', fontWeight: '500' }}>
-        <span>Дни</span>
-        <span>Часы</span>
-      </div>
+      <style>{`
+        .ios-picker-container {
+          margin: 16px 0;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 16px;
+          padding: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .ios-picker-label {
+          display: block;
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          margin-bottom: 12px;
+          font-weight: 500;
+          text-align: center;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .ios-picker-wrapper {
+          position: relative;
+          height: 180px;
+          overflow: hidden;
+          mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+          -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+        }
+        .ios-picker-selection-highlight {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          height: 44px;
+          transform: translateY(-50%);
+          background: rgba(var(--accent-primary-rgb), 0.08);
+          border-top: 1px solid rgba(var(--accent-primary-rgb), 0.2);
+          border-bottom: 1px solid rgba(var(--accent-primary-rgb), 0.2);
+          pointer-events: none;
+          z-index: 10;
+          border-radius: 8px;
+        }
+        /* Mobile Picker overrides */
+        .picker-column {
+          flex: 1;
+        }
+      `}</style>
     </div>
   );
 };

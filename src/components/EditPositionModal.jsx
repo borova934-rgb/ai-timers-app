@@ -132,12 +132,13 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
         <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--separator)', opacity: timer.isZero ? 1 : 0.5 }}>
           <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: 'var(--text-dim)', fontWeight: 'bold' }}>Авто-сброс лимитов:</p>
           <IOSRefreshPicker 
-            days={refreshTimers[field]?.days || 0}
-            hours={refreshTimers[field]?.hours || 0}
-            disabled={!timer.isZero}
-            onChange={(d, h) => {
-               updateRefresh(field, 'days', d);
-               updateRefresh(field, 'hours', h);
+            value={refreshTimers[field] || { days: 0, hours: 0 }}
+            label="Интервал авто-сброса"
+            onChange={(val) => {
+               if (timer.isZero) {
+                 updateRefresh(field, 'days', val.days);
+                 updateRefresh(field, 'hours', val.hours);
+               }
             }}
           />
         </div>

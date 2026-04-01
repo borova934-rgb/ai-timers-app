@@ -155,7 +155,7 @@ function App() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
             <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '800', lineHeight: 1.1, letterSpacing: '-0.5px' }}>Аккаунты</h1>
-            <span style={{ fontSize: '12px', color: 'var(--text-dim)', opacity: 0.8 }}>v1.0.2</span>
+            <span style={{ fontSize: '12px', color: 'var(--text-dim)', opacity: 0.8 }}>v1.0.3</span>
           </div>
           
           <div style={{ display: 'flex', background: 'var(--panel-bg)', borderRadius: '14px', padding: '3px', boxShadow: 'var(--shadow)', height: 'fit-content' }}>
@@ -200,30 +200,32 @@ function App() {
 
       <div className="ios-glass" style={{
         position: 'fixed',
-        bottom: '44px',
+        bottom: '32px',
         left: '50%',
         transform: 'translateX(-50%)',
         borderRadius: '50%',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
         padding: '3px',
-        zIndex: 1000
+        zIndex: 1000,
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
       }}>
         <button 
           onClick={() => setShowAddModal(true)}
           style={{
-            width: '72px',
-            height: '72px',
+            width: '82px',
+            height: '82px',
             borderRadius: '50%',
             background: 'var(--accent)',
+            backgroundLinearGradient: 'linear-gradient(135deg, var(--accent) 0%, #0055ff 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             border: 'none',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+            boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 15px rgba(0,0,0,0.2)'
           }}
         >
-          <Plus size={40} color="#fff" strokeWidth={3} />
+          <Plus size={44} color="#fff" strokeWidth={3} />
         </button>
       </div>
 

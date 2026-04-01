@@ -149,18 +149,23 @@ const AddPositionModal = ({ onClose, onSave }) => {
               </label>
               <IOSDateSelect value={claudeAnthropic} onChange={setClaudeAnthropic} />
               
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Значок на главном экране (например: "Pro")</label>
-              <input 
-                type="text" 
-                value={claudeAnthropicBadge} 
-                onChange={e => setClaudeAnthropicBadge(e.target.value)}
-                placeholder="Pro"
-                style={{
-                  width: '100%', padding: '12px', borderRadius: '10px', 
-                  border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
-                  color: 'var(--text-main)', marginBottom: 0, fontSize: '16px', outline: 'none'
-                }}
-              />
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Тип аккаунта Claude Anthropic</label>
+              <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '10px', padding: '4px', border: '1px solid var(--separator)' }}>
+                {['Free', 'Pro', 'Max'].map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setClaudeAnthropicBadge(type)}
+                    style={{
+                      flex: 1, padding: '6px', border: 'none', background: claudeAnthropicBadge === type ? 'var(--accent)' : 'transparent',
+                      color: claudeAnthropicBadge === type ? '#fff' : 'var(--text-main)', borderRadius: '6px', fontWeight: claudeAnthropicBadge === type ? 'bold' : 'normal',
+                      transition: 'all 0.2s', fontSize: '14px'
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

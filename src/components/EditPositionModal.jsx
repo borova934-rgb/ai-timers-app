@@ -132,24 +132,24 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
           <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--text-dim)' }}>Обновление лимитов (авто-сброс):</p>
           <div style={{ display: 'flex', gap: '8px' }}>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px', padding: '4px 8px' }}>
-               <input 
-                  type="number" min="0" 
-                  value={refreshTimers[field]?.days || ''} 
+               <select 
+                  value={refreshTimers[field]?.days || '0'} 
                   onChange={(e) => updateRefresh(field, 'days', e.target.value)}
                   disabled={!timer.isZero}
-                  style={{ width: '40px', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', textAlign: 'right', cursor: timer.isZero ? 'text' : 'not-allowed' }} 
-               />
-               <span style={{ fontSize: '12px', color: 'var(--text-dim)', marginLeft: '4px' }}>дней</span>
+                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', cursor: timer.isZero ? 'pointer' : 'not-allowed', fontSize: '14px' }} 
+               >
+                 {[...Array(31).keys()].map(d => <option key={d} value={d}>{d} дн.</option>)}
+               </select>
             </div>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px', padding: '4px 8px' }}>
-               <input 
-                  type="number" min="0" max="23"
-                  value={refreshTimers[field]?.hours || ''} 
+               <select 
+                  value={refreshTimers[field]?.hours || '0'} 
                   onChange={(e) => updateRefresh(field, 'hours', e.target.value)}
                   disabled={!timer.isZero}
-                  style={{ width: '40px', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', textAlign: 'right', cursor: timer.isZero ? 'text' : 'not-allowed' }} 
-               />
-               <span style={{ fontSize: '12px', color: 'var(--text-dim)', marginLeft: '4px' }}>часов</span>
+                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', cursor: timer.isZero ? 'pointer' : 'not-allowed', fontSize: '14px' }} 
+               >
+                 {[...Array(24).keys()].map(h => <option key={h} value={h}>{h} ч.</option>)}
+               </select>
             </div>
           </div>
         </div>
@@ -267,18 +267,23 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
         {claudeAnthropicEnabled && (
           <div style={{ background: 'rgba(0,0,0,0.03)', padding: '12px', borderRadius: '12px', marginBottom: '16px' }}>
             {renderControl('Claude Anthropic', 'claudeAnthropic', claudeAnthropicTimer, claudeAnthropic, setClaudeAnthropic)}
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Значок на главном экране (например: "Pro")</label>
-            <input 
-              type="text" 
-              value={claudeAnthropicBadge} 
-              onChange={e => setClaudeAnthropicBadge(e.target.value)}
-              placeholder="Pro"
-              style={{
-                width: '100%', padding: '12px', borderRadius: '10px', 
-                border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
-                color: 'var(--text-main)', marginBottom: 0, fontSize: '16px', outline: 'none'
-              }}
-            />
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Тип аккаунта Claude Anthropic</label>
+            <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '10px', padding: '4px', border: '1px solid var(--separator)' }}>
+              {['Free', 'Pro', 'Max'].map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setClaudeAnthropicBadge(type)}
+                  style={{
+                    flex: 1, padding: '6px', border: 'none', background: claudeAnthropicBadge === type ? 'var(--accent)' : 'transparent',
+                    color: claudeAnthropicBadge === type ? '#fff' : 'var(--text-main)', borderRadius: '6px', fontWeight: claudeAnthropicBadge === type ? 'bold' : 'normal',
+                    transition: 'all 0.2s', fontSize: '14px'
+                  }}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

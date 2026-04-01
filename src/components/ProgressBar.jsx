@@ -1,4 +1,5 @@
 import React from 'react';
+import { RefreshCcw } from 'lucide-react';
 
 const ProgressBar = ({ name, data, refreshTimer }) => {
   const { passedPercentage, isZero, days, hours, minutes } = data;
@@ -7,27 +8,33 @@ const ProgressBar = ({ name, data, refreshTimer }) => {
   const hue = 39 + ((passedPercentage / 100) * (120 - 39));
   const fillColor = `hsl(${hue}, 100%, 45%)`; // slightly darker baseline
 
-  let timerText = '';
-  if (!isZero) {
-      // Default primary countdown (МСК)
-      timerText = `${days}д ${hours}ч ${minutes}м (МСК)`;
-  } else if (refreshTimer && refreshTimer.targetTimestamp && refreshTimer.targetTimestamp > Date.now()) {
-      // Auto-refresh countdown (only active when primary timer is not running)
-      const diffMs = refreshTimer.targetTimestamp - Date.now();
-      const rd = Math.floor(diffMs / (24 * 60 * 60 * 1000));
-      const rh = Math.floor((diffMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-      timerText = `Обновление лимитов через ${rd}д ${rh}ч`;
-  } else {
-      // Fallback
-      timerText = passedPercentage === 100 ? '0д 0ч 0м (МСК)' : 'Завершено';
-  }
+  const renderTimerText = () => {
+    if (!isZero) {
+        // Default primary countdown (МСК)
+        return `${days}д ${hours}ч ${minutes}м (МСК)`;
+    } else if (refreshTimer && refreshTimer.targetTimestamp && refreshTimer.targetTimestamp > Date.now()) {
+        // Auto-refresh countdown (only active when primary timer is not running)
+        const diffMs = refreshTimer.targetTimestamp - Date.now();
+        const rd = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+        const rh = Math.floor((diffMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        return (
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <RefreshCcw size={12} strokeWidth={3} />
+            лимиты через {rd}д {rh}ч
+          </span>
+        );
+    } else {
+        // Fallback
+        return passedPercentage === 100 ? '0д 0ч 0м (МСК)' : 'Завершено';
+    }
+  };
 
   return (
     <div style={{ marginBottom: '10px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>
         <span>{name}</span>
         <span style={{ color: 'var(--text-dim)', fontSize: '13px' }}>
-          {timerText}
+          {renderTimerText()}
         </span>
       </div>
       <div style={{ 

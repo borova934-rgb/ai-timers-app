@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Plus, Minus } from 'lucide-react';
 import { calculateTimeRemaining } from '../utils';
 import IOSDateSelect from './IOSDateSelect';
+import IOSRefreshPicker from './IOSRefreshPicker';
 
 const EditPositionModal = ({ position, onClose, onUpdate }) => {
   const [name, setName] = useState(position.name);
@@ -16,10 +17,10 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
   const [accountType, setAccountType] = useState(position.accountType || 'Free');
 
   const [refreshTimers, setRefreshTimers] = useState(position.refreshTimers || {
-    geminiPro: {days: '', hours: '', targetTimestamp: null },
-    geminiFlash: {days: '', hours: '', targetTimestamp: null },
-    claude: {days: '', hours: '', targetTimestamp: null },
-    claudeAnthropic: {days: '', hours: '', targetTimestamp: null }
+    geminiPro: {days: '0', hours: '0', targetTimestamp: null },
+    geminiFlash: {days: '0', hours: '0', targetTimestamp: null },
+    claude: {days: '0', hours: '0', targetTimestamp: null },
+    claudeAnthropic: {days: '0', hours: '0', targetTimestamp: null }
   });
 
   const geminiProTimer = calculateTimeRemaining(geminiPro, position.overrides?.geminiPro);
@@ -129,29 +130,16 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
         </div>
         
         <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--separator)', opacity: timer.isZero ? 1 : 0.5 }}>
-          <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--text-dim)' }}>Обновление лимитов (авто-сброс):</p>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px', padding: '4px 8px' }}>
-               <select 
-                  value={refreshTimers[field]?.days || '0'} 
-                  onChange={(e) => updateRefresh(field, 'days', e.target.value)}
-                  disabled={!timer.isZero}
-                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', cursor: timer.isZero ? 'pointer' : 'not-allowed', fontSize: '14px' }} 
-               >
-                 {[...Array(31).keys()].map(d => <option key={d} value={d}>{d} дн.</option>)}
-               </select>
-            </div>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px', padding: '4px 8px' }}>
-               <select 
-                  value={refreshTimers[field]?.hours || '0'} 
-                  onChange={(e) => updateRefresh(field, 'hours', e.target.value)}
-                  disabled={!timer.isZero}
-                  style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', cursor: timer.isZero ? 'pointer' : 'not-allowed', fontSize: '14px' }} 
-               >
-                 {[...Array(24).keys()].map(h => <option key={h} value={h}>{h} ч.</option>)}
-               </select>
-            </div>
-          </div>
+          <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: 'var(--text-dim)', fontWeight: 'bold' }}>Авто-сброс лимитов:</p>
+          <IOSRefreshPicker 
+            days={refreshTimers[field]?.days || 0}
+            hours={refreshTimers[field]?.hours || 0}
+            disabled={!timer.isZero}
+            onChange={(d, h) => {
+               updateRefresh(field, 'days', d);
+               updateRefresh(field, 'hours', h);
+            }}
+          />
         </div>
         
         {!timer.isZero && <p style={{ margin: '12px 0 0 0', fontSize: '12px', color: 'var(--color-danger)', textAlign: 'center' }}>Недоступно: основной таймер еще работает</p>}

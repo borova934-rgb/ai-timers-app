@@ -204,23 +204,26 @@ function App() {
         left: '50%',
         transform: 'translateX(-50%)',
         borderRadius: '50%',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-        padding: '2px', // subtle border effect
+        boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+        padding: '3px',
         zIndex: 1000
       }}>
         <button 
           onClick={() => setShowAddModal(true)}
           style={{
-            width: '56px',
-            height: '56px',
+            width: '72px',
+            height: '72px',
             borderRadius: '50%',
             background: 'var(--accent)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            cursor: 'pointer',
+            border: 'none',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
           }}
         >
-          <Plus size={32} color="#fff" />
+          <Plus size={40} color="#fff" strokeWidth={3} />
         </button>
       </div>
 

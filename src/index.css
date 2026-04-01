@@ -58,6 +58,24 @@
   --color-success: #5DB573;
 }
 
+[data-theme='titanium'] {
+  --bg-color: #2F2E2C;
+  --panel-bg: #3D3C3A;
+  --text-main: #F4F2EC;
+  --text-dim: #A6A4A0;
+  --text-dimmer: #7C7B77;
+  --accent: #B8A892;
+  --accent-pressed: #968875;
+  --separator: rgba(200, 196, 188, 0.15);
+  --glass-bg: rgba(61, 60, 58, 0.85);
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  
+  --bar-bg: #4B4A47;
+  --color-danger: #FF6A65;
+  --color-warning: #FFB340;
+  --color-success: #4CD964;
+}
+
 * {
   box-sizing: border-box;
 }

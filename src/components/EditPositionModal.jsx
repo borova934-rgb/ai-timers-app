@@ -5,6 +5,7 @@ import IOSDateSelect from './IOSDateSelect';
 
 const EditPositionModal = ({ position, onClose, onUpdate }) => {
   const [name, setName] = useState(position.name);
+  const [antigravityName, setAntigravityName] = useState(position.antigravityName || '');
   const [geminiPro, setGeminiPro] = useState(position.geminiPro);
   const [geminiFlash, setGeminiFlash] = useState(position.geminiFlash);
   const [claude, setClaude] = useState(position.claude);
@@ -13,6 +14,13 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
   const [claudeAnthropicBadge, setClaudeAnthropicBadge] = useState(position.claudeAnthropicBadge || 'Pro');
   const [country, setCountry] = useState(position.country || '');
   const [accountType, setAccountType] = useState(position.accountType || 'Free');
+
+  const [refreshTimers, setRefreshTimers] = useState(position.refreshTimers || {
+    geminiPro: {days: '', hours: '', targetTimestamp: null },
+    geminiFlash: {days: '', hours: '', targetTimestamp: null },
+    claude: {days: '', hours: '', targetTimestamp: null },
+    claudeAnthropic: {days: '', hours: '', targetTimestamp: null }
+  });
 
   const geminiProTimer = calculateTimeRemaining(geminiPro, position.overrides?.geminiPro);
   const geminiFlashTimer = calculateTimeRemaining(geminiFlash, position.overrides?.geminiFlash);
@@ -37,10 +45,43 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
     });
   };
 
+  const updateRefresh = (field, key, value) => {
+    setRefreshTimers(prev => ({
+      ...prev,
+      [field]: {
+        ...(prev[field] || {}),
+        [key]: value
+      }
+    }));
+  };
+
   const saveDatesAndClose = () => {
+    const updatedRefreshTimers = { ...refreshTimers };
+    
+    // Compute target if the duration changed
+    ['geminiPro', 'geminiFlash', 'claude', 'claudeAnthropic'].forEach(field => {
+       const rt = updatedRefreshTimers[field];
+       if (!rt) return;
+       const d = parseInt(rt.days, 10) || 0;
+       const h = parseInt(rt.hours, 10) || 0;
+       const oldRt = position.refreshTimers?.[field];
+       
+       if (d === 0 && h === 0) {
+          rt.targetTimestamp = null;
+       } else {
+          const oldD = oldRt ? (parseInt(oldRt.days, 10) || 0) : 0;
+          const oldH = oldRt ? (parseInt(oldRt.hours, 10) || 0) : 0;
+          if (d !== oldD || h !== oldH || !rt.targetTimestamp) {
+             const durationMs = (d * 24 * 60 * 60 * 1000) + (h * 60 * 60 * 1000);
+             rt.targetTimestamp = Date.now() + durationMs;
+          }
+       }
+    });
+
     onUpdate(position.id, {
       ...position,
       name,
+      antigravityName,
       geminiPro,
       geminiFlash,
       claude,
@@ -48,7 +89,8 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
       claudeAnthropicEnabled,
       claudeAnthropicBadge,
       country,
-      accountType
+      accountType,
+      refreshTimers: updatedRefreshTimers
     });
     onClose();
   };
@@ -85,7 +127,34 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
             <Plus size={20} color="var(--accent)" />
           </button>
         </div>
-        {!timer.isZero && <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: 'var(--color-danger)' }}>Недоступно: таймер еще работает</p>}
+        
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--separator)', opacity: timer.isZero ? 1 : 0.5 }}>
+          <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--text-dim)' }}>Обновление лимитов (авто-сброс):</p>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px', padding: '4px 8px' }}>
+               <input 
+                  type="number" min="0" 
+                  value={refreshTimers[field]?.days || ''} 
+                  onChange={(e) => updateRefresh(field, 'days', e.target.value)}
+                  disabled={!timer.isZero}
+                  style={{ width: '40px', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', textAlign: 'right', cursor: timer.isZero ? 'text' : 'not-allowed' }} 
+               />
+               <span style={{ fontSize: '12px', color: 'var(--text-dim)', marginLeft: '4px' }}>дней</span>
+            </div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px', padding: '4px 8px' }}>
+               <input 
+                  type="number" min="0" max="23"
+                  value={refreshTimers[field]?.hours || ''} 
+                  onChange={(e) => updateRefresh(field, 'hours', e.target.value)}
+                  disabled={!timer.isZero}
+                  style={{ width: '40px', background: 'transparent', border: 'none', color: 'var(--text-main)', outline: 'none', textAlign: 'right', cursor: timer.isZero ? 'text' : 'not-allowed' }} 
+               />
+               <span style={{ fontSize: '12px', color: 'var(--text-dim)', marginLeft: '4px' }}>часов</span>
+            </div>
+          </div>
+        </div>
+        
+        {!timer.isZero && <p style={{ margin: '12px 0 0 0', fontSize: '12px', color: 'var(--color-danger)', textAlign: 'center' }}>Недоступно: основной таймер еще работает</p>}
       </div>
     );
   };
@@ -120,11 +189,24 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
         
         <h2 style={{ marginTop: 0, marginBottom: '16px' }}>Настройки</h2>
         
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Имя аккаунта</label>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Имя аккаунта (основное)</label>
         <input 
           type="text" 
           value={name} 
           onChange={e => setName(e.target.value)}
+          style={{
+            width: '100%', padding: '12px', borderRadius: '10px', 
+            border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
+            color: 'var(--text-main)', marginBottom: '16px', fontSize: '16px', outline: 'none'
+          }}
+        />
+
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Имя в Antigravity</label>
+        <input 
+          type="text" 
+          value={antigravityName} 
+          onChange={e => setAntigravityName(e.target.value)}
+          placeholder="Псевдоним (опц.)"
           style={{
             width: '100%', padding: '12px', borderRadius: '10px', 
             border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
@@ -148,20 +230,23 @@ const EditPositionModal = ({ position, onClose, onUpdate }) => {
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Тип аккаунта</label>
-            <select 
-              value={accountType} 
-              onChange={e => setAccountType(e.target.value)}
-              style={{
-                width: '100%', padding: '12px', borderRadius: '10px', 
-                border: '1px solid var(--separator)', backgroundColor: 'var(--bg-color)',
-                color: 'var(--text-main)', marginBottom: 0, fontSize: '16px', outline: 'none', WebkitAppearance: 'none'
-              }}
-            >
-              <option value="Free">Free</option>
-              <option value="Pro">Pro</option>
-              <option value="Ultra">Ultra</option>
-            </select>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>Тип</label>
+            <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '10px', padding: '4px', border: '1px solid var(--separator)' }}>
+                {['Free', 'Pro', 'Ultra'].map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setAccountType(type)}
+                    style={{
+                      flex: 1, padding: '6px', border: 'none', background: accountType === type ? 'var(--accent)' : 'transparent',
+                      color: accountType === type ? '#fff' : 'var(--text-main)', borderRadius: '6px', fontWeight: accountType === type ? 'bold' : 'normal',
+                      transition: 'all 0.2s', fontSize: '13px'
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+            </div>
           </div>
         </div>
 

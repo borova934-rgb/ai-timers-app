@@ -4,6 +4,7 @@ import IOSDateSelect from './IOSDateSelect';
 
 const AddPositionModal = ({ onClose, onSave }) => {
   const [name, setName] = useState('');
+  const [antigravityName, setAntigravityName] = useState('');
   
   // Default string for date select to initialize
   const defaultDateStr = "";
@@ -23,6 +24,7 @@ const AddPositionModal = ({ onClose, onSave }) => {
     onSave({
       id: Date.now().toString(),
       name,
+      antigravityName,
       geminiPro,
       geminiFlash,
       claude,
@@ -31,7 +33,8 @@ const AddPositionModal = ({ onClose, onSave }) => {
       claudeAnthropicBadge,
       country,
       accountType,
-      overrides: { geminiPro: null, geminiFlash: null, claude: null, claudeAnthropic: null }
+      overrides: { geminiPro: null, geminiFlash: null, claude: null, claudeAnthropic: null },
+      refreshTimers: { geminiPro: null, geminiFlash: null, claude: null, claudeAnthropic: null }
     });
   };
 
@@ -88,7 +91,7 @@ const AddPositionModal = ({ onClose, onSave }) => {
         
         <form onSubmit={handleSubmit}>
           <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
-            Имя аккаунта
+            Имя аккаунта (основное)
           </label>
           <input 
             type="text" 
@@ -97,6 +100,17 @@ const AddPositionModal = ({ onClose, onSave }) => {
             placeholder="например, name@gmail.com"
             style={{...inputStyle, fontFamily: 'inherit'}}
             required
+          />
+
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
+            Имя в Antigravity
+          </label>
+          <input 
+            type="text" 
+            value={antigravityName} 
+            onChange={e => setAntigravityName(e.target.value)} 
+            placeholder="Псевдоним (опц.)"
+            style={{...inputStyle, fontFamily: 'inherit'}}
           />
 
           <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '12px', lineHeight: '1.4' }}>
@@ -167,15 +181,22 @@ const AddPositionModal = ({ onClose, onSave }) => {
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: 'var(--text-dim)' }}>
                 Тип аккаунта
               </label>
-              <select 
-                value={accountType} 
-                onChange={e => setAccountType(e.target.value)}
-                style={{...inputStyle, marginBottom: 0, fontFamily: 'inherit', WebkitAppearance: 'none'}}
-              >
-                <option value="Free">Free</option>
-                <option value="Pro">Pro</option>
-                <option value="Ultra">Ultra</option>
-              </select>
+              <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '10px', padding: '4px', border: '1px solid var(--separator)' }}>
+                {['Free', 'Pro', 'Ultra'].map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setAccountType(type)}
+                    style={{
+                      flex: 1, padding: '6px', border: 'none', background: accountType === type ? 'var(--accent)' : 'transparent',
+                      color: accountType === type ? '#fff' : 'var(--text-main)', borderRadius: '6px', fontWeight: accountType === type ? 'bold' : 'normal',
+                      transition: 'all 0.2s', fontSize: '14px'
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

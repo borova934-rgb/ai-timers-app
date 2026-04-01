@@ -22,6 +22,64 @@ function App() {
     setPositions(savedPositions);
   }, []);
 
+  // Use a ref for positions to avoid dependency loops in the interval
+  const positionsRef = React.useRef(positions);
+  useEffect(() => {
+    positionsRef.current = positions;
+  }, [positions]);
+
+  // Master interval loop to auto-refresh timers
+  useEffect(() => {
+    const timer = setInterval(() => {
+        let updated = false;
+        const now = Date.now();
+        const currentPositions = positionsRef.current;
+        
+        const newPositions = currentPositions.map(pos => {
+           if (!pos.refreshTimers) return pos;
+           
+           let posChanged = false;
+           const newPos = { ...pos, overrides: { ...pos.overrides } };
+           
+           ['geminiPro', 'geminiFlash', 'claude', 'claudeAnthropic'].forEach(key => {
+               const rt = pos.refreshTimers[key];
+               if (rt && rt.targetTimestamp && now >= rt.targetTimestamp) {
+                   // Reset!
+                   newPos.overrides[key] = 100;
+                   
+                   // Calculate new target by adding the same duration (ms) until target is in the future
+                   const durationMs = (rt.days * 24 * 60 * 60 * 1000) + (rt.hours * 60 * 60 * 1000);
+                   if (durationMs > 0) {
+                       let nextTarget = rt.targetTimestamp;
+                       while (nextTarget <= now) {
+                           nextTarget += durationMs;
+                       }
+                       // Ensure immutability for nesting
+                       if (!newPos.refreshTimers) newPos.refreshTimers = { ...pos.refreshTimers };
+                       if (!newPos.refreshTimers[key]) newPos.refreshTimers[key] = { ...rt };
+                       
+                       newPos.refreshTimers[key] = { ...newPos.refreshTimers[key], targetTimestamp: nextTarget };
+                   }
+                   posChanged = true;
+               }
+           });
+           
+           if (posChanged) { 
+               updated = true; 
+               return newPos; 
+           }
+           return pos;
+        });
+
+        if (updated) {
+            setPositions(newPositions);
+            localStorage.setItem('positions', JSON.stringify(newPositions));
+        }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+
   // Sync theme
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
@@ -93,11 +151,14 @@ function App() {
     <div style={{ maxWidth: '600px', margin: '0 auto', minHeight: '100vh', padding: '16px', paddingBottom: '80px' }}>
       
       {/* Header & Theme Switcher */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0 24px 0' }}>
-        <h1 style={{ margin: 0, fontSize: '32px', fontWeight: '800' }}>Аккаунты</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', margin: '16px 0 24px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
+          <h1 style={{ margin: 0, fontSize: '32px', fontWeight: '800', lineHeight: 1 }}>Аккаунты</h1>
+          <span style={{ fontSize: '13px', color: 'var(--text-dim)', fontWeight: 'bold' }}>v1.0.2</span>
+        </div>
         
         <div style={{ display: 'flex', background: 'var(--panel-bg)', borderRadius: '16px', padding: '4px', boxShadow: 'var(--shadow)' }}>
-          {['light', 'dark', 'cream'].map((t) => (
+          {['light', 'dark', 'cream', 'titanium'].map((t) => (
             <button 
               key={t}
               onClick={() => handleThemeChange(t)}
